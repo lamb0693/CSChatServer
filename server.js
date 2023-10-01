@@ -35,8 +35,8 @@ ioServer.on('connection', (socket) => {
     });
 
     // ********* CHAT MESSAGE EVENT ******************//
-    socket.on('chatData', (param) => {
-        ioServer.emit('chat message', param.nickname + ':' + param.message);
+    socket.on('chat_data', (param) => {
+        ioServer.emit('chat_data', param);
     });
 });
 
