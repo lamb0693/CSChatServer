@@ -25,13 +25,13 @@ ioServer.on('connection', (socket) => {
     socket.on('audio_data', (param) => {
         console.log('audio_data arrived')
         //console.log(param)
-        ioServer.emit('audio_data', param)
+        socket.broadcast.emit('audio_data', param)
     });
 
     socket.on('canvas_data', (param) => {
         console.log('canvas_data arrived')
         //console.log(param)
-        ioServer.emit('canvas_data', param)
+        socket.broadcast.emit('canvas_data', param)
     });
 
     // ********* CHAT MESSAGE EVENT ******************//
