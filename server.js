@@ -31,7 +31,7 @@ const updateRoom = () => {
     counselRooms.forEach((room, roomName) => {
         //console.log(roomName.length) - default room name
         //** id를 15자 이하로 꼭 하자 */
-        if (roomName.length <= 15) {
+        if (roomName.length <= 20) {
             counselRoomsTransfer.push({
                 'roomName': roomName,
                 'roomSize': room.size
