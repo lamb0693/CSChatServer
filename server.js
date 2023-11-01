@@ -64,13 +64,16 @@ const getRoomSize = (roomName) => {
 
 const updateRoomAndSendRoomListtoAllClient = () => {
     updateRoom();
-    counselServer.emit('counsel_rooms_info', counselRoomsTransfer); // 방 list를 보낸다 get_room_list callback으로 대체
+    console.log('emitting counsel_rooms_info message', counselRoomsTransfer)
+    counselServer.emit('counsel_rooms_info', counselRoomsTransfer); 
 };
 
 
 counselServer.on('connection', (socket) => {
     console.log('a user connected');
     console.log(counselServer.adapter.rooms)
+    // 나중에 지우자s
+    //socket.emit("chat_data", "server says Hello")
     updateRoomAndSendRoomListtoAllClient();
     //counselServer.emit("chat_data", "hello")
 
@@ -99,27 +102,28 @@ counselServer.on('connection', (socket) => {
         counselServer.emit('chat_data', param);
     });
 
+    // ********* CHAT MESSAGE EVENT ******************//
+    socket.on('update_board', () => {
+        console.log("update_board : arrived" )
+        counselServer.emit('update_board');
+    });
+
+
+    
+
 
     // *********** CREATE ROOM******************//
     // callback 을 하니 Kotlin 함수가 넘어와도 처리가 잘 안됨
     // client에서 처리하도록 message만 보냄
     socket.on('create_room', (roomName) => {
         console.log('create_room name : ' + roomName);
-        counselServer.emit('create_room_result', 'success')
-        // 있으면 clientCallback('fail') 
-        // 없으면 join(방 만들기) clientCallback('success') 실행 
-        // if (checkExistRoomByName(roomName)) {
-        //     //console.log("on quiz_create_room : room exist")
-        //     clientCallback('fail', roomName);
-        // }
-        // else {
-        //     //console.log("make new room " + roomName)
-        //     socket.join(roomName);
-        //     clientCallback('success', roomName);
-        //     // gameData 준비
-        //    // prepareGame(roomName, txtUserId, txtUserNick, socket.id, 0);
-        //     updateRoomAndSendRoomListtoAllClient(); // join하면 room 현황 broadcasiting
-        // }
+        if(checkExistRoomByName(roomName)){
+            counselServer.emit('create_room_result', 'fail')
+        } else {
+            socket.join(roomName)
+            counselServer.emit('create_room_result', 'success')
+            updateRoomAndSendRoomListtoAllClient()
+        }
     });
 
 });
