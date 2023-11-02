@@ -31,7 +31,7 @@ const updateRoom = () => {
     counselRooms.forEach((room, roomName) => {
         //console.log(roomName.length) - default room name
         //** id를 15자 이하로 꼭 하자 */
-        if (roomName.length <= 20) {
+        if (roomName.length <= 15) {
             counselRoomsTransfer.push({
                 'roomName': roomName,
                 'roomSize': room.size
@@ -105,7 +105,7 @@ counselServer.on('connection', (socket) => {
     // ********* CHAT MESSAGE EVENT ******************//
     socket.on('update_board', () => {
         console.log("update_board : arrived" )
-        counselServer.emit('update_board');
+        counselServer.emit('update_board', 'do update');
     });
 
 
@@ -125,6 +125,12 @@ counselServer.on('connection', (socket) => {
             updateRoomAndSendRoomListtoAllClient()
         }
     });
+
+    socket.on('leave_room', (roomName) => {
+        console.log('leave_room :' + roomName)
+        socket.leave(roomName)
+        updateRoomAndSendRoomListtoAllClient()
+    })
 
 });
 
