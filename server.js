@@ -132,6 +132,19 @@ counselServer.on('connection', (socket) => {
         updateRoomAndSendRoomListtoAllClient()
     })
 
+    socket.on('join_room', (roomName) => {
+        if( checkExistRoomByName(roomName) ) {
+            socket.join(roomName)
+            updateRoomAndSendRoomListtoAllClient()
+            console.log('상담원이 join 함')
+            counselServer.emit('csr_joined', 'CSR joined room')
+        } else {
+            console.log('방이 없어요')
+            socket.emit('no room exist', 'csr fail to join')
+        }
+
+    })
+
 });
 
 server.listen(3000, () => {
