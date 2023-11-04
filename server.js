@@ -96,14 +96,14 @@ counselServer.on('connection', (socket) => {
         socket.broadcast.emit('canvas_data', param)
     });
 
-    // ********* CHAT MESSAGE EVENT ******************//
-    socket.on('chat_data', (param) => {
-        console.log("chat_data :" + param)
-        counselServer.emit('chat_data', param);
-    });
+    // // ********* CHAT MESSAGE EVENT ******************//
+    // socket.on('chat_data', (param) => {
+    //     console.log("chat_data :" + param)
+    //     counselServer.emit('chat_data', param);
+    // });
 
     // ********* CHAT MESSAGE EVENT ******************//
-    socket.on('update_board', () => {
+    socket.on('update_board', (roomName) => {
         console.log("update_board : arrived" )
         counselServer.emit('update_board', 'do update');
     });
