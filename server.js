@@ -130,6 +130,14 @@ counselServer.on('connection', (socket) => {
         console.log('leave_room :' + roomName)
         socket.leave(roomName)
         updateRoomAndSendRoomListtoAllClient()
+        counselServer.emit('user_left_room', roomName)
+    })
+
+    // user_left_room -> csr - > csr_leave_room 방 비운다
+    socket.on('csr_leave_room', (roomName) => {
+        console.log('leave_room :' + roomName)
+        socket.leave(roomName)
+        updateRoomAndSendRoomListtoAllClient()
     })
 
     socket.on('join_room', (roomName) => {
