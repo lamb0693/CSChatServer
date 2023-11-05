@@ -22,6 +22,8 @@ const counselServer = ioServer.of('/counsel')
 let counselRooms = null; // adapter로 구할 방
 let counselRoomsTransfer = []; // transfer 용 array를 만듬
 
+let roomSocket = {}
+
 // server의 quizRooms, quizRoomsTransfer 를 update //
 // callback 함수에서 온 거라 ioServer 필요
 const updateRoom = () => {
@@ -78,16 +80,16 @@ counselServer.on('connection', (socket) => {
     //counselServer.emit("chat_data", "hello")
 
     socket.on('disconnect', () => {
-        console.log('user disconnected');
-
+         console.log('user disconnected');
+         counselServer.emit('user_left_room', roomSocket[socket.id])
     });
 
     // ********* audio_data EVENT ******************//
 
-    socket.on('audio_data', (param) => {
-        console.log('audio_data arrived')
+    socket.on('audio_data', (roomName, audioData) => {
+        console.log('audio_data arrived', roomName)
         //console.log(param)
-        socket.broadcast.emit('audio_data', param)
+        socket.to(roomName).emit('audio_data', audioData)
     });
 
     socket.on('canvas_data', (param) => {
@@ -96,7 +98,7 @@ counselServer.on('connection', (socket) => {
         socket.broadcast.emit('canvas_data', param)
     });
 
-    // // ********* CHAT MESSAGE EVENT ******************//
+    // ********* CHAT MESSAGE EVENT ******************//
     // socket.on('chat_data', (param) => {
     //     console.log("chat_data :" + param)
     //     counselServer.emit('chat_data', param);
@@ -104,12 +106,9 @@ counselServer.on('connection', (socket) => {
 
     // ********* CHAT MESSAGE EVENT ******************//
     socket.on('update_board', (roomName) => {
-        console.log("update_board : arrived" )
-        counselServer.emit('update_board', 'do update');
+        console.log("update_board : roomName", roomName )
+        counselServer.to(roomName).emit('update_board', 'do update');
     });
-
-
-    
 
 
     // *********** CREATE ROOM******************//
@@ -121,6 +120,8 @@ counselServer.on('connection', (socket) => {
             counselServer.emit('create_room_result', 'fail')
         } else {
             socket.join(roomName)
+            roomSocket[socket.id] = roomName
+            console.log("roomSocket", roomSocket)
             counselServer.emit('create_room_result', 'success')
             updateRoomAndSendRoomListtoAllClient()
         }
@@ -129,6 +130,8 @@ counselServer.on('connection', (socket) => {
     socket.on('leave_room', (roomName) => {
         console.log('leave_room :' + roomName)
         socket.leave(roomName)
+        delete roomSocket[socket.id]
+        console.log("roomSocket", roomSocket)
         updateRoomAndSendRoomListtoAllClient()
         counselServer.emit('user_left_room', roomName)
     })
