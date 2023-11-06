@@ -52,7 +52,7 @@ const checkExistRoomByName = (roomName) => {
             break;
         }
     }
-    console.log('checkExistRooms returns ' + bExist);
+    //console.log('checkExistRooms returns ' + bExist);
     return bExist;
 };
 
@@ -85,17 +85,30 @@ counselServer.on('connection', (socket) => {
     });
 
     // ********* audio_data EVENT ******************//
+    socket.on('customor_audio_start', (roomName, audioData) => {
+        console.log('customor_audio_start', roomName)
+        //console.log(param)
+        socket.to(roomName).emit('customor_audio_started', "customer audio started")
+    });
+
+    socket.on('customor_audio_stop', (roomName, audioData) => {
+        console.log('customor_audio_stop', roomName)
+        //console.log(param)
+        socket.to(roomName).emit('customor_audio_stopped', "customer audio stopped")
+    });
 
     socket.on('audio_data', (roomName, audioData) => {
-        console.log('audio_data arrived', roomName)
+        //console.log('audio_data arrived', roomName)
         //console.log(param)
         socket.to(roomName).emit('audio_data', audioData)
     });
 
-    socket.on('canvas_data', (param) => {
+      // ********* canvas_data EVENT ******************//
+
+    socket.on('canvas_data', (roomName, param) => {
         console.log('canvas_data arrived')
         //console.log(param)
-        socket.broadcast.emit('canvas_data', param)
+        socket.to(roomName).emit('canvas_data', param)
     });
 
     // ********* CHAT MESSAGE EVENT ******************//
