@@ -97,6 +97,20 @@ counselServer.on('connection', (socket) => {
         socket.to(roomName).emit('customor_audio_stopped', "customer audio stopped")
     });
 
+    socket.on('csr_audio_start', (roomName, param) => {
+        console.log('csr_audio_start', roomName)
+        //console.log(param)
+        socket.to(roomName).emit('csr_audio_started', "csr audio started")
+        //counselServer.emit('csr_audio_started', "csr audio started")
+    });
+
+    socket.on('csr_audio_stop', (roomName, param) => {
+        console.log('csr_audio_stop', roomName)
+        //console.log(param)
+        socket.to(roomName).emit('csr_audio_stopped', "customer audio stopped")
+        //counselServer.emit('csr_audio_stopped', "csr audio stopped")
+    });
+
     socket.on('audio_data', (roomName, audioData) => {
         //console.log('audio_data arrived', roomName)
         //console.log(param)
