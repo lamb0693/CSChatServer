@@ -81,8 +81,19 @@ counselServer.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
          console.log('user disconnected');
+         // socket으로 이름을 찾아 room에서도 나가고, roomSocket배열에서도 제거
+         if(roomSocket[socket.id] != null) {
+            roomName = roomSocket[socket.id]
+            console.log("disconnect로 나감 leave", roomName)
+            socket.leave(roomName)
+            delete roomSocket[socket.id]
+         }
+         updateRoomAndSendRoomListtoAllClient()
          counselServer.emit('user_left_room', roomSocket[socket.id])
     });
+
+
+    // socket.broadcast.to.emit 으로 바꿀지
 
     // ********* audio_data EVENT ******************//
     socket.on('customor_audio_start', (roomName, audioData) => {
@@ -165,14 +176,25 @@ counselServer.on('connection', (socket) => {
 
     // user_left_room -> csr - > csr_leave_room 방 비운다
     socket.on('csr_leave_room', (roomName) => {
-        console.log('leave_room :' + roomName)
-        socket.leave(roomName)
+        //이미 나가서 room name이 null
+        let strRoomName = roomSocket[socket.id]
+        console.log('leave_room csr:' + strRoomName)
+
+        // 요게 방을 못 없앤다 ***** 에러 제거하자
+        //****************************** */
+        socket.leave[strRoomName]
+        // 먼저 방을 떠나고 roomSocket에서 뺌
+        delete roomSocket[socket.id]
+        console.log("roomSocket", roomSocket)
+
         updateRoomAndSendRoomListtoAllClient()
     })
 
     socket.on('join_room', (roomName) => {
         if( checkExistRoomByName(roomName) ) {
             socket.join(roomName)
+            roomSocket[socket.id] = roomName
+            console.log("roomSocket", roomSocket)
             updateRoomAndSendRoomListtoAllClient()
             console.log('상담원이 join 함')
             counselServer.emit('csr_joined', 'CSR joined room')
